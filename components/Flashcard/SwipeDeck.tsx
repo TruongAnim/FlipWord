@@ -21,9 +21,10 @@ interface SwipeDeckProps {
     onSwipeRight: (word: Word) => void;
     onSwipeLeft: (word: Word) => void;
     onFinish?: () => void;
+    displayMode?: 'en-vi' | 'vi-en';
 }
 
-export default function SwipeDeck({ words, onSwipeRight, onSwipeLeft, onFinish }: SwipeDeckProps) {
+export default function SwipeDeck({ words, onSwipeRight, onSwipeLeft, onFinish, displayMode = 'en-vi' }: SwipeDeckProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
@@ -131,14 +132,14 @@ export default function SwipeDeck({ words, onSwipeRight, onSwipeLeft, onFinish }
             {/* Next Card (Behind) */}
             {currentIndex < words.length - 1 && (
                 <Animated.View style={[styles.cardContainer, nextCardStyle]} className="absolute">
-                    <FlipCard word={words[currentIndex + 1]} />
+                    <FlipCard word={words[currentIndex + 1]} displayMode={displayMode} />
                 </Animated.View>
             )}
 
             {/* Top Card */}
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.cardContainer, cardStyle]}>
-                    <FlipCard key={words[currentIndex].id} word={words[currentIndex]} />
+                    <FlipCard key={words[currentIndex].id} word={words[currentIndex]} displayMode={displayMode} />
 
                     {/* Like Overlay */}
                     <Animated.View style={[styles.overlay, { left: 40, top: 40, borderColor: '#10B981', transform: [{ rotate: '-30deg' }] }, likeOpacityStyle]}>

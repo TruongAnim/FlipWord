@@ -17,8 +17,13 @@ const shuffleArray = (array: Word[]) => {
     return array;
 };
 
+import { useLocalSearchParams } from 'expo-router';
+
 export default function FlashcardScreen() {
     const router = useRouter();
+    const { mode } = useLocalSearchParams<{ mode: 'en-vi' | 'vi-en' }>();
+    const currentMode = mode || 'en-vi';
+
     const [words, setWords] = useState<Word[]>([]);
     const [loading, setLoading] = useState(true);
     const [rememberedCount, setRememberedCount] = useState(0);
@@ -27,11 +32,11 @@ export default function FlashcardScreen() {
 
     useEffect(() => {
         loadWords();
-    }, []);
+    }, [currentMode]);
 
     const loadWords = async () => {
         setLoading(true);
-        const data = await wordRepository.getWords();
+        const data = await wordRepository.getWords(currentMode);
         setWords(shuffleArray([...data]));
         setLoading(false);
     };
@@ -103,6 +108,7 @@ export default function FlashcardScreen() {
                         onSwipeRight={handleSwipeRight}
                         onSwipeLeft={handleSwipeLeft}
                         onFinish={handleFinish}
+                        displayMode={currentMode}
                     />
                 )}
             </View>

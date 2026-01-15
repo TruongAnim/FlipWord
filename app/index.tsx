@@ -26,17 +26,32 @@ export default function HomeScreen() {
             <ScrollView className="flex-1 px-4 pt-6">
                 <Text className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Features</Text>
 
-                {/* Feature Card: Flashcard */}
+                {/* Feature Card: Flashcard (En-Vi) */}
                 <TouchableOpacity
-                    onPress={() => router.push('/flashcard')}
+                    onPress={() => router.push('/flashcard?mode=en-vi')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
                     <View className="w-16 h-16 bg-blue-100 rounded-xl items-center justify-center mr-4">
                         <Ionicons name="documents-outline" size={32} color="#3B82F6" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Flashcards</Text>
-                        <Text className="text-gray-500 text-sm">Learn words (Eng - Viet)</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-1">Eng - Viet</Text>
+                        <Text className="text-gray-500 text-sm">Learn words (English to Vietnamese)</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+
+                {/* Feature Card: Flashcard (Vi-En) */}
+                <TouchableOpacity
+                    onPress={() => router.push('/flashcard?mode=vi-en')}
+                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
+                >
+                    <View className="w-16 h-16 bg-orange-100 rounded-xl items-center justify-center mr-4">
+                        <Ionicons name="repeat-outline" size={32} color="#F97316" />
+                    </View>
+                    <View className="flex-1">
+                        <Text className="text-lg font-bold text-gray-800 mb-1">Viet - Eng</Text>
+                        <Text className="text-gray-500 text-sm">Ôn tập (Vietnamese to English)</Text>
                     </View>
                     <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
