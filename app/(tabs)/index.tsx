@@ -1,30 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hello World!</Text>
-      <Text style={styles.subtitle}>Welcome to FlipWord</Text>
+    <View className="flex-1 items-center justify-center bg-white">
+      <Text className="text-3xl font-bold mb-2 text-gray-800">Hello World!</Text>
+      <Text className="text-lg text-gray-600">Welcome to FlipWord</Text>
+      <View className="mt-5 p-4 bg-blue-500 rounded-lg shadow-lg">
+        <Text className="text-white font-bold text-center">ReactWind (NativeWind) is Active!</Text>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666',
-  },
-});
 
