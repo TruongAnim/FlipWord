@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
@@ -25,6 +24,9 @@ export default function SpellingScreen() {
 
     const [userInput, setUserInput] = useState('');
     const [status, setStatus] = useState<'idle' | 'correct' | 'incorrect'>('idle');
+    const [correctCount, setCorrectCount] = useState(0);
+    const [incorrectCount, setIncorrectCount] = useState(0);
+    const [isCompleted, setIsCompleted] = useState(false);
     const inputRef = useRef<TextInput>(null);
 
     useEffect(() => {
@@ -45,6 +47,13 @@ export default function SpellingScreen() {
 
         const isMatch = userInput.trim().toLowerCase() === currentWord.english.toLowerCase();
         setStatus(isMatch ? 'correct' : 'incorrect');
+
+        if (isMatch) {
+            setCorrectCount(prev => prev + 1);
+        } else {
+            setIncorrectCount(prev => prev + 1);
+        }
+
         Keyboard.dismiss();
     };
 
@@ -53,26 +62,18 @@ export default function SpellingScreen() {
             setCurrentIndex(prev => prev + 1);
             resetState();
         } else {
-            // Did finish all words
-            // Simple reset for now or navigate back
-            router.back();
+            setIsCompleted(true);
         }
     };
 
     const resetState = () => {
         setUserInput('');
         setStatus('idle');
-        // Keep keyboard open or re-focus? 
-        // User requested "no toggle keyboard", relying on autoFocus might not work perfectly without a timeout on Android, 
-        // but on iOS usually fine if we don't dismiss.
-        // However, I dismissed it on 'Check' to show result clearly. 
-        // Let's try to focus again.
         setTimeout(() => {
             inputRef.current?.focus();
         }, 100);
     };
 
-    // Masking logic: Replace the target word in the example sentence with underscores
     const getMaskedSentence = (word: Word) => {
         if (!word) return '';
         const regex = new RegExp(`\\b${word.english}\\b`, 'gi');
@@ -87,11 +88,48 @@ export default function SpellingScreen() {
         );
     }
 
+    if (isCompleted) {
+        return (
+            <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
+                <View className="items-center w-full max-w-sm">
+                    <View className="mb-8 p-6 bg-purple-50 rounded-full">
+                        <Ionicons name="medal" size={80} color="#8B5CF6" />
+                    </View>
+
+                    <Text className="text-3xl font-bold text-gray-800 mb-2">Excellent Work!</Text>
+                    <Text className="text-gray-500 text-center mb-8">You have completed your spelling practice.</Text>
+
+                    <View className="flex-row justify-between w-full mb-8">
+                        <View className="items-center bg-green-50 p-4 rounded-2xl flex-1 mr-2">
+                            <Text className="text-3xl font-bold text-green-600">{correctCount}</Text>
+                            <Text className="text-green-700 font-medium">Correct</Text>
+                        </View>
+                        <View className="items-center bg-red-50 p-4 rounded-2xl flex-1 ml-2">
+                            <Text className="text-3xl font-bold text-red-600">{incorrectCount}</Text>
+                            <Text className="text-red-700 font-medium">Incorrect</Text>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity
+                        className="w-full bg-purple-600 py-4 rounded-xl shadow-md flex-row justify-center items-center"
+                        onPress={() => router.back()}
+                    >
+                        <Ionicons name="home" size={20} color="white" style={{ marginRight: 8 }} />
+                        <Text className="text-white font-bold text-lg">Back to Home</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    // Generate underscores for hint
+    const hintUnderscores = Array(currentWord.english.length).fill('_').join(' ');
+
     return (
         <SafeAreaView className="flex-1 bg-purple-50">
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                className="flex-1"
+                style={{ flex: 1 }}
             >
                 {/* Header */}
                 <View className="flex-row items-center px-4 py-2 bg-purple-50 z-10">
@@ -108,7 +146,24 @@ export default function SpellingScreen() {
 
                     {/* Question Card */}
                     <View className="bg-white rounded-3xl p-6 shadow-sm border border-purple-100 mb-8 items-center">
-                        <Text className="text-gray-500 font-medium uppercase tracking-wider mb-4">Translate & Spell</Text>
+
+                        {/* Status / Hint Header */}
+                        <View className="flex-row items-center justify-center mb-4 h-10">
+                            {status === 'idle' ? (
+                                <Text className="text-2xl font-mono text-gray-400 tracking-widest">{hintUnderscores}</Text>
+                            ) : (
+                                <View className="flex-row items-center">
+                                    <Text className={`text-2xl font-bold mr-2 ${status === 'correct' ? 'text-green-600' : 'text-red-600'}`}>
+                                        {currentWord.english}
+                                    </Text>
+                                    <Ionicons
+                                        name={status === 'correct' ? 'checkmark-circle' : 'alert-circle'}
+                                        size={28}
+                                        color={status === 'correct' ? '#15803D' : '#B91C1C'}
+                                    />
+                                </View>
+                            )}
+                        </View>
 
                         <Text className="text-3xl font-bold text-gray-800 text-center mb-6 leading-tight">
                             {currentWord.vietnamese}
@@ -123,14 +178,14 @@ export default function SpellingScreen() {
                     </View>
 
                     {/* Input Area */}
-                    <View className="mb-6">
+                    <View className="mb-6 flex-1 justify-end">
                         <Text className="ml-2 mb-2 text-gray-600 font-medium">Type the English word:</Text>
                         <TextInput
                             ref={inputRef}
                             value={userInput}
                             onChangeText={(text) => {
                                 setUserInput(text);
-                                if (status !== 'idle') setStatus('idle'); // Reset status if user types again
+                                if (status !== 'idle') setStatus('idle');
                             }}
                             placeholder="Type here..."
                             autoCapitalize="none"
@@ -143,48 +198,29 @@ export default function SpellingScreen() {
                     `}
                             onSubmitEditing={status === 'idle' ? handleCheck : handleNext}
                         />
-                    </View>
 
-                    {/* Feedback Area */}
-                    {status !== 'idle' && (
-                        <Animated.View entering={FadeInDown} className={`rounded-xl p-4 mb-6 flex-row items-center ${status === 'correct' ? 'bg-green-100' : 'bg-red-100'}`}>
-                            <Ionicons
-                                name={status === 'correct' ? 'checkmark-circle' : 'alert-circle'}
-                                size={28}
-                                color={status === 'correct' ? '#15803D' : '#B91C1C'}
-                            />
-                            <View className="ml-3 flex-1">
-                                <Text className={`font-bold text-lg ${status === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
-                                    {status === 'correct' ? 'Correct!' : 'Incorrect'}
+                        {/* Action Button - Placed directly below input to prevent pushing */}
+                        <View className="mt-6 h-16">
+                            <TouchableOpacity
+                                onPress={status === 'idle' ? handleCheck : handleNext}
+                                className={`
+                            w-full h-full rounded-2xl shadow-md flex-row justify-center items-center
+                            ${status === 'idle' ? 'bg-purple-600' : ''}
+                            ${status === 'correct' ? 'bg-green-600' : ''}
+                            ${status === 'incorrect' ? 'bg-purple-600' : ''}
+                        `}
+                            >
+                                <Text className="text-white font-bold text-xl mr-2">
+                                    {status === 'idle' ? 'Check Answer' : 'Next Word'}
                                 </Text>
-                                {status === 'incorrect' && (
-                                    <Text className="text-red-600 font-medium mt-1">
-                                        Answer: <Text className="font-bold">{currentWord.english}</Text>
-                                    </Text>
-                                )}
-                            </View>
-                        </Animated.View>
-                    )}
-
-                    {/* Action Button */}
-                    <TouchableOpacity
-                        onPress={status === 'idle' ? handleCheck : handleNext}
-                        className={`
-                    w-full py-4 rounded-2xl shadow-md flex-row justify-center items-center
-                    ${status === 'idle' ? 'bg-purple-600' : ''}
-                    ${status === 'correct' ? 'bg-green-600' : ''}
-                    ${status === 'incorrect' ? 'bg-purple-600' : ''}
-                `}
-                    >
-                        <Text className="text-white font-bold text-xl mr-2">
-                            {status === 'idle' ? 'Check Answer' : 'Next Word'}
-                        </Text>
-                        <Ionicons
-                            name={status === 'idle' ? 'checkmark' : 'arrow-forward'}
-                            size={24}
-                            color="white"
-                        />
-                    </TouchableOpacity>
+                                <Ionicons
+                                    name={status === 'idle' ? 'checkmark' : 'arrow-forward'}
+                                    size={24}
+                                    color="white"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
 
                 </ScrollView>
             </KeyboardAvoidingView>
