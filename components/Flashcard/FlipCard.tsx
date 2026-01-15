@@ -4,7 +4,7 @@ import Animated, {
     interpolate,
     useAnimatedStyle,
     useSharedValue,
-    withSpring
+    withTiming
 } from 'react-native-reanimated';
 import { Word } from '../../data/models/Word';
 
@@ -16,7 +16,7 @@ export default function FlipCard({ word }: FlipCardProps) {
     const isFlipped = useSharedValue(0);
 
     const handlePress = () => {
-        isFlipped.value = withSpring(isFlipped.value ? 0 : 1, { damping: 12, stiffness: 90 });
+        isFlipped.value = withTiming(isFlipped.value ? 0 : 1, { duration: 300 });
     };
 
     const frontAnimatedStyle = useAnimatedStyle(() => {

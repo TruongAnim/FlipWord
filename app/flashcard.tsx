@@ -7,10 +7,23 @@ import SwipeDeck from '../components/Flashcard/SwipeDeck';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
 
+const shuffleArray = (array: Word[]) => {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+};
+
 export default function FlashcardScreen() {
     const router = useRouter();
     const [words, setWords] = useState<Word[]>([]);
     const [loading, setLoading] = useState(true);
+    const [rememberedCount, setRememberedCount] = useState(0);
+    const [forgotCount, setForgotCount] = useState(0);
+    const [isCompleted, setIsCompleted] = useState(false);
 
     useEffect(() => {
         loadWords();
@@ -19,17 +32,55 @@ export default function FlashcardScreen() {
     const loadWords = async () => {
         setLoading(true);
         const data = await wordRepository.getWords();
-        setWords(data);
+        setWords(shuffleArray([...data]));
         setLoading(false);
     };
 
     const handleSwipeRight = (word: Word) => {
-        console.log(`Remembered: ${word.english}`);
+        setRememberedCount(prev => prev + 1);
     };
 
     const handleSwipeLeft = (word: Word) => {
-        console.log(`Forgot: ${word.english}`);
+        setForgotCount(prev => prev + 1);
     };
+
+    const handleFinish = () => {
+        setIsCompleted(true);
+    };
+
+    if (isCompleted) {
+        return (
+            <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
+                <View className="items-center w-full max-w-sm">
+                    <View className="mb-8 p-6 bg-blue-50 rounded-full">
+                        <Ionicons name="trophy" size={80} color="#F59E0B" />
+                    </View>
+
+                    <Text className="text-3xl font-bold text-gray-800 mb-2">Well Done!</Text>
+                    <Text className="text-gray-500 text-center mb-8">You have completed your session.</Text>
+
+                    <View className="flex-row justify-between w-full mb-8">
+                        <View className="items-center bg-green-50 p-4 rounded-2xl flex-1 mr-2">
+                            <Text className="text-3xl font-bold text-green-600">{rememberedCount}</Text>
+                            <Text className="text-green-700 font-medium">Remembered</Text>
+                        </View>
+                        <View className="items-center bg-red-50 p-4 rounded-2xl flex-1 ml-2">
+                            <Text className="text-3xl font-bold text-red-600">{forgotCount}</Text>
+                            <Text className="text-red-700 font-medium">Forgot</Text>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity
+                        className="w-full bg-blue-500 py-4 rounded-xl shadow-md flex-row justify-center items-center"
+                        onPress={() => router.back()}
+                    >
+                        <Ionicons name="home" size={20} color="white" style={{ marginRight: 8 }} />
+                        <Text className="text-white font-bold text-lg">Back to Home</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
@@ -51,10 +102,7 @@ export default function FlashcardScreen() {
                         words={words}
                         onSwipeRight={handleSwipeRight}
                         onSwipeLeft={handleSwipeLeft}
-                        onFinish={() => {
-                            // Could navigate back or show a retry button here
-                            console.log("Finished all cards");
-                        }}
+                        onFinish={handleFinish}
                     />
                 )}
             </View>

@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -123,15 +122,7 @@ export default function SwipeDeck({ words, onSwipeRight, onSwipeLeft, onFinish }
 
 
     if (currentIndex >= words.length) {
-        return (
-            <View className="flex-1 items-center justify-center p-6">
-                <View className="bg-white p-8 rounded-3xl items-center shadow-lg w-full">
-                    <Ionicons name="checkmark-circle" size={64} color="#10B981" />
-                    <Text className="text-2xl font-bold text-gray-800 mt-4 text-center">All Done!</Text>
-                    <Text className="text-gray-500 text-center mt-2">You've reviewed all cards for today.</Text>
-                </View>
-            </View>
-        );
+        return null;
     }
 
     return (
@@ -147,7 +138,7 @@ export default function SwipeDeck({ words, onSwipeRight, onSwipeLeft, onFinish }
             {/* Top Card */}
             <GestureDetector gesture={gesture}>
                 <Animated.View style={[styles.cardContainer, cardStyle]}>
-                    <FlipCard word={words[currentIndex]} />
+                    <FlipCard key={words[currentIndex].id} word={words[currentIndex]} />
 
                     {/* Like Overlay */}
                     <Animated.View style={[styles.overlay, { left: 40, top: 40, borderColor: '#10B981', transform: [{ rotate: '-30deg' }] }, likeOpacityStyle]}>
