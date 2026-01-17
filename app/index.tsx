@@ -71,6 +71,21 @@ export default function HomeScreen() {
                     <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
 
+                {/* Feature Card: Fill in the Blank */}
+                <TouchableOpacity
+                    onPress={() => router.push('/fill-blank')}
+                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
+                >
+                    <View className="w-16 h-16 bg-blue-100 rounded-xl items-center justify-center mr-4">
+                        <Ionicons name="text-outline" size={32} color="#2563EB" />
+                    </View>
+                    <View className="flex-1">
+                        <Text className="text-lg font-bold text-gray-800 mb-1">Fill in the Blank</Text>
+                        <Text className="text-gray-500 text-sm">Complete the sentence</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+
                 {/* Feature Card: Placeholder */}
                 <TouchableOpacity
                     disabled
