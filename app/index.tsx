@@ -101,6 +101,21 @@ export default function HomeScreen() {
                     <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
 
+                {/* Feature Card: Reverse Multiple Choice */}
+                <TouchableOpacity
+                    onPress={() => router.push('/reverse-multiple-choice')}
+                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
+                >
+                    <View className="w-16 h-16 bg-orange-100 rounded-xl items-center justify-center mr-4">
+                        <Ionicons name="swap-horizontal-outline" size={32} color="#EA580C" />
+                    </View>
+                    <View className="flex-1">
+                        <Text className="text-lg font-bold text-gray-800 mb-1">Reverse Choice</Text>
+                        <Text className="text-gray-500 text-sm">Find English word</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+
                 {/* Feature Card: Placeholder */}
                 <TouchableOpacity
                     disabled
