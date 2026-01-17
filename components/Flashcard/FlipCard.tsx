@@ -44,14 +44,14 @@ export default function FlipCard({ word, displayMode = 'en-vi' }: FlipCardProps)
         if (displayMode === 'en-vi') {
             return <Text className="text-4xl font-bold text-gray-800 text-center">{word.english}</Text>;
         }
-        return <Text className="text-4xl font-bold text-gray-800 text-center">{word.vietnamese}</Text>;
+        return <Text className="text-4xl font-bold text-gray-800 text-center">{word.vietnamese.split(',')[0].trim()}</Text>;
     };
 
     const BackContent = () => {
         if (displayMode === 'en-vi') {
             return (
                 <>
-                    <Text className="text-3xl font-bold text-white mb-2 text-center">{word.vietnamese}</Text>
+                    <Text className="text-3xl font-bold text-white mb-2 text-center">{word.vietnamese.split(',')[0].trim()}</Text>
                     <View className="w-16 h-1 bg-white/30 rounded-full my-4" />
                     <Text className="text-lg text-white font-medium text-center italic">"{word.example}"</Text>
                     <Text className="text-sm text-blue-100 text-center mt-2">({word.exampleMeaning})</Text>

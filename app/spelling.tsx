@@ -166,7 +166,7 @@ export default function SpellingScreen() {
                         </View>
 
                         <Text className="text-3xl font-bold text-gray-800 text-center mb-6 leading-tight">
-                            {currentWord.vietnamese}
+                            {currentWord.vietnamese.split(',')[0].trim()}
                         </Text>
 
                         <View className="bg-purple-50 w-full p-4 rounded-xl">

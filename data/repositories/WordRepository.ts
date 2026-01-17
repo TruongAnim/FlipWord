@@ -1,5 +1,4 @@
 import { DUMMY_WORDS } from '../dummyData';
-import { DUMMY_WORDS_VI_EN } from '../dummyDataViEn';
 import { Word } from '../models/Word';
 
 export interface WordRepository {
@@ -11,7 +10,7 @@ export class LocalWordRepository implements WordRepository {
         // Simulate network delay
         return new Promise((resolve) => {
             setTimeout(() => {
-                const data = mode === 'vi-en' ? DUMMY_WORDS_VI_EN : DUMMY_WORDS;
+                const data = DUMMY_WORDS;
                 resolve([...data]);
             }, 500);
         });
