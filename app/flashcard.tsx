@@ -39,7 +39,7 @@ export default function FlashcardScreen() {
     const loadWords = async () => {
         setLoading(true);
         const data = await wordRepository.getWords(currentMode);
-        setWords(shuffleArray([...data]));
+        setWords(shuffleArray([...data]).slice(0, GameConfig.FLASHCARD_COUNT));
         setLoading(false);
     };
 

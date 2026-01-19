@@ -47,9 +47,10 @@ export default function FillBlankScreen() {
 
         // Shuffle words to get random questions
         const shuffledWords = shuffleArray([...allWords]);
+        const targetWords = shuffledWords.slice(0, GameConfig.FILL_BLANK_COUNT);
 
         // Generate questions
-        const newQuestions: Question[] = shuffledWords.map((targetWord) => {
+        const newQuestions: Question[] = targetWords.map((targetWord) => {
             // Pick 3 random distractors distinct from target
             const otherWords = allWords.filter(w => w.id !== targetWord.id);
             const distractors = shuffleArray(otherWords).slice(0, 3).map(w => w.english);

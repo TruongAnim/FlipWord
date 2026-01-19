@@ -38,7 +38,7 @@ export default function SpellingScreen() {
     const loadWords = async () => {
         setLoading(true);
         const data = await wordRepository.getWords('en-vi');
-        setWords(shuffleArray([...data]));
+        setWords(shuffleArray([...data]).slice(0, GameConfig.SPELLING_COUNT));
         setLoading(false);
     };
 

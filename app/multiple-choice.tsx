@@ -45,8 +45,9 @@ export default function MultipleChoiceScreen() {
         const allWords = await wordRepository.getWords('en-vi');
 
         const shuffledWords = shuffleArray([...allWords]);
+        const targetWords = shuffledWords.slice(0, GameConfig.MULTIPLE_CHOICE_COUNT);
 
-        const newQuestions: Question[] = shuffledWords.map((targetWord) => {
+        const newQuestions: Question[] = targetWords.map((targetWord) => {
             // Pick 3 random distractors
             const otherWords = allWords.filter(w => w.id !== targetWord.id);
             const distractors = shuffleArray(otherWords).slice(0, 3).map(w => w.vietnamese.split(',')[0].trim());

@@ -64,10 +64,9 @@ export default function WordMatchScreen() {
     const loadGame = async () => {
         setLoading(true);
         const allWords = await wordRepository.getWords('en-vi');
-        setTotalPairs(allWords.length);
-
-        // Shuffle all words
-        const shuffledAll = shuffleArray([...allWords]);
+        // Shuffle all words and slice for current game session
+        const shuffledAll = shuffleArray([...allWords]).slice(0, GameConfig.WORD_MATCH_COUNT);
+        setTotalPairs(shuffledAll.length);
 
         // Take first 6 for initial slots
         const initialWords = shuffledAll.slice(0, 6);
