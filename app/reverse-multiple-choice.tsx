@@ -137,7 +137,7 @@ export default function ReverseMultipleChoiceScreen() {
                 <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
                     <Ionicons name="arrow-back" size={24} color="#EA580C" />
                 </TouchableOpacity>
-                <Text className="text-xl font-bold text-gray-800">Reverse Choice</Text>
+                <Text className="text-xl font-bold text-gray-800">Word Hunter</Text>
                 <View className="flex-1 items-end">
                     <Text className="text-orange-600 font-medium">{currentIndex + 1}/{questions.length}</Text>
                 </View>

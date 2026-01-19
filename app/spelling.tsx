@@ -136,7 +136,7 @@ export default function SpellingScreen() {
                     <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
                         <Ionicons name="arrow-back" size={24} color="#5B21B6" />
                     </TouchableOpacity>
-                    <Text className="text-xl font-bold text-gray-800">Spelling Practice</Text>
+                    <Text className="text-xl font-bold text-gray-800">Spelling Bee</Text>
                     <View className="flex-1 items-end">
                         <Text className="text-purple-600 font-medium">{currentIndex + 1}/{words.length}</Text>
                     </View>

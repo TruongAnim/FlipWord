@@ -161,7 +161,7 @@ export default function FillBlankScreen() {
                 <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
                     <Ionicons name="arrow-back" size={24} color="#1E40AF" />
                 </TouchableOpacity>
-                <Text className="text-xl font-bold text-gray-800">Fill in the Blank</Text>
+                <Text className="text-xl font-bold text-gray-800">Context Master</Text>
                 <View className="flex-1 items-end">
                     <Text className="text-blue-600 font-medium">{currentIndex + 1}/{questions.length}</Text>
                 </View>

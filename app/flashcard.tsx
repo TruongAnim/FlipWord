@@ -90,11 +90,18 @@ export default function FlashcardScreen() {
     return (
         <SafeAreaView className="flex-1 bg-gray-50">
             {/* Header */}
-            <View className="flex-row items-center px-4 py-2">
-                <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2">
-                    <Ionicons name="arrow-back" size={24} color="#374151" />
-                </TouchableOpacity>
-                <Text className="text-xl font-bold text-gray-800">Flashcards</Text>
+            <View className="flex-row items-center px-4 py-2 justify-between">
+                <View className="flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2">
+                        <Ionicons name="arrow-back" size={24} color="#374151" />
+                    </TouchableOpacity>
+                    <Text className="text-xl font-bold text-gray-800">
+                        {currentMode === 'en-vi' ? 'Essential Flashcards' : 'Active Recall'}
+                    </Text>
+                </View>
+                <Text className="text-blue-600 font-medium">
+                    {rememberedCount + forgotCount}/{words.length}
+                </Text>
             </View>
 
             <View className="flex-1 relative">

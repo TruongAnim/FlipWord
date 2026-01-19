@@ -290,9 +290,12 @@ export default function WordMatchScreen() {
         <SafeAreaView className="flex-1 bg-pink-50">
             {/* Header */}
             <View className="flex-row items-center px-4 py-2 bg-pink-50 z-10 justify-between">
-                <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
-                    <Ionicons name="arrow-back" size={24} color="#DB2777" />
-                </TouchableOpacity>
+                <View className="flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
+                        <Ionicons name="arrow-back" size={24} color="#DB2777" />
+                    </TouchableOpacity>
+                    <Text className="text-xl font-bold text-gray-800 ml-2">Power Matching</Text>
+                </View>
 
                 <View className="flex-row space-x-2">
                     <View className="bg-white px-3 py-1 rounded-full border border-red-100">
