@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { LineChart } from "react-native-chart-kit";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { trackingRepository, ProgressRecord, SessionRecord } from '../data/repositories/TrackingRepository';
 
@@ -43,6 +44,11 @@ export default function UserProfileScreen() {
         todayMinutes: 0, // New Field
         wordsRemembered: 0,
         wordsMastered: 0,
+    });
+    const [chartData, setChartData] = useState({
+        labels: [] as string[],
+        wordsData: [] as number[],
+        sessionsData: [] as number[]
     });
     const [quote, setQuote] = useState("");
 
@@ -109,6 +115,8 @@ export default function UserProfileScreen() {
             if (count >= 5) mastered++;
         });
 
+
+
         setStats({
             wordsLearned: learned,
             sessionsCompleted: sessionsCount,
@@ -116,6 +124,60 @@ export default function UserProfileScreen() {
             todayMinutes,
             wordsRemembered: remembered,
             wordsMastered: mastered
+        });
+
+        // 5. Chart Data (Last 7 Days)
+        const labels: string[] = [];
+        const wordsData: number[] = [];
+        const sessionsData: number[] = [];
+        const daysMap = new Map<string, { words: Set<string>, sessions: number }>();
+
+        // Initialize last 7 days map
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+            const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+
+            labels.push(dayLabel);
+            daysMap.set(dateStr, { words: new Set(), sessions: 0 });
+        }
+
+        // Process Attempts for Words Learned (Unique per day)
+        attempts.forEach(a => {
+            const dateStr = new Date(a.timestamp).toISOString().split('T')[0];
+            if (daysMap.has(dateStr)) {
+                if (a.isCorrect) {
+                    daysMap.get(dateStr)?.words.add(a.wordId);
+                }
+            }
+        });
+
+        // Process Sessions
+        sessions.forEach(s => {
+            const dateStr = new Date(s.timestamp).toISOString().split('T')[0];
+            if (daysMap.has(dateStr)) {
+                const entry = daysMap.get(dateStr);
+                if (entry) entry.sessions += 1;
+            }
+        });
+
+        // Flatten to arrays
+        // We iterate based on the init loop order, but map keys iteration order is insertion order in simple cases, 
+        // better to re-iterate the 7 days to match labels index.
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const entry = daysMap.get(dateStr);
+            wordsData.push(entry ? entry.words.size : 0);
+            sessionsData.push(entry ? entry.sessions : 0);
+        }
+
+        setChartData({
+            labels,
+            wordsData,
+            sessionsData
         });
 
         setLoading(false);
@@ -131,11 +193,11 @@ export default function UserProfileScreen() {
                 <Text className="text-xl font-bold text-gray-800">Profile</Text>
             </View>
 
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 12 }}>
 
                 {/* User Info */}
                 <View className="items-center mb-8">
-                    <View className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-lg mb-4">
+                    <View className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-md mb-4">
                         <Ionicons name="person" size={48} color="#3B82F6" />
                     </View>
                     <Text className="text-2xl font-bold text-gray-800">Learner</Text>
@@ -192,7 +254,7 @@ export default function UserProfileScreen() {
                 </View>
 
                 {/* Stats Grid */}
-                <View className="flex-row flex-wrap gap-4">
+                <View className="flex-row flex-wrap gap-4 mb-8">
                     {/* Words Learned */}
                     <View className="w-[47%] bg-blue-50 p-4 rounded-2xl border border-blue-100">
                         <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center mb-3">
@@ -227,6 +289,66 @@ export default function UserProfileScreen() {
                         </View>
                         <Text className="text-3xl font-bold text-gray-800 mb-1">{stats.wordsMastered}</Text>
                         <Text className="text-gray-500 text-xs font-medium">Mastered (5+)</Text>
+                    </View>
+                </View>
+
+                {/* Activity Chart */}
+                <View className="bg-white pl-2 pr-4 py-4 rounded-2xl border border-gray-100 shadow-sm mb-8">
+                    <Text className="text-lg font-bold text-gray-800 mb-4 ml-2">
+                        Last 7 Days Activity
+                    </Text>
+
+                    <View style={{ overflow: "hidden" }}>
+                        {chartData.labels.length > 0 ? (
+                            <LineChart
+                                data={{
+                                    labels: chartData.labels,
+                                    datasets: [
+                                        {
+                                            data: chartData.wordsData,
+                                            color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                                            strokeWidth: 2,
+                                        },
+                                        {
+                                            data: chartData.sessionsData,
+                                            color: (opacity = 1) => `rgba(124, 58, 237, ${opacity})`,
+                                            strokeWidth: 2,
+                                        },
+                                    ],
+                                    legend: ["Words Learned", "Sessions Done"],
+                                }}
+                                width={Dimensions.get("window").width - 20}
+                                height={220}
+                                chartConfig={{
+                                    backgroundColor: "#ffffff",
+                                    backgroundGradientFrom: "#ffffff",
+                                    backgroundGradientTo: "#ffffff",
+                                    decimalPlaces: 0,
+                                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(107, 114, 128, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16,
+                                    },
+                                    propsForDots: {
+                                        r: "4",
+                                        strokeWidth: "2",
+                                        stroke: "#fff",
+                                    },
+                                }}
+                                bezier
+                                style={{
+                                    marginVertical: 0,
+                                    borderRadius: 16,
+                                    marginLeft: -32,
+                                }}
+                            />
+                        ) : (
+                            <View className="h-[220px] items-center justify-center">
+                                <Text className="text-gray-400">
+                                    Not enough data to display chart
+                                </Text>
+                            </View>
+                        )}
                     </View>
                 </View>
 
