@@ -8,37 +8,39 @@ export default function HomeScreen() {
     const router = useRouter();
 
     return (
-        <SafeAreaView className="flex-1 bg-gray-50">
+        <SafeAreaView className="flex-1 bg-white">
             {/* App Bar */}
-            <View className="flex-row justify-between items-center px-6 py-4 bg-white shadow-sm">
-                <View className="flex-row items-center gap-2">
-                    <View className="w-10 h-10 bg-blue-500 rounded-full items-center justify-center">
-                        <Ionicons name="book" size={24} color="white" />
+            <View className="flex-row justify-between items-start px-6 pt-4 pb-6 bg-white border-b border-gray-100">
+                <View>
+                    <View className="flex-row items-center gap-2 mb-1">
+                        <View className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center shadow-sm">
+                            <Ionicons name="book" size={18} color="white" />
+                        </View>
+                        <Text className="text-2xl font-extrabold text-slate-800 tracking-tight">FlipWord</Text>
                     </View>
-                    <Text className="text-2xl font-bold text-gray-800">FlipWord</Text>
+                    <Text className="text-slate-500 font-medium text-sm">Master your vocabulary daily</Text>
                 </View>
-                <TouchableOpacity className="p-2 bg-gray-100 rounded-full">
-                    <Ionicons name="settings-outline" size={24} color="#374151" />
+                <TouchableOpacity className="p-2 bg-gray-50 rounded-full border border-gray-100">
+                    <Ionicons name="settings-outline" size={22} color="#475569" />
                 </TouchableOpacity>
             </View>
 
             {/* Content */}
-            <ScrollView className="flex-1 px-4 pt-6">
-                <Text className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Features</Text>
+            <ScrollView className="flex-1 bg-gray-50 px-4 pt-6" contentContainerStyle={{ paddingBottom: 40 }}>
 
                 {/* Feature Card: Flashcard (En-Vi) */}
                 <TouchableOpacity
                     onPress={() => router.push('/flashcard?mode=en-vi')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-blue-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="documents-outline" size={32} color="#3B82F6" />
+                    <View className="w-16 h-16 bg-blue-50 rounded-xl items-center justify-center mr-4 border border-blue-100">
+                        <Ionicons name="library-outline" size={30} color="#3B82F6" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Eng - Viet</Text>
-                        <Text className="text-gray-500 text-sm">Learn words (English to Vietnamese)</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Essential Flashcards</Text>
+                        <Text className="text-gray-500 text-sm">Build your vocabulary foundation</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Flashcard (Vi-En) */}
@@ -46,14 +48,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/flashcard?mode=vi-en')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-orange-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="repeat-outline" size={32} color="#F97316" />
+                    <View className="w-16 h-16 bg-orange-50 rounded-xl items-center justify-center mr-4 border border-orange-100">
+                        <Ionicons name="refresh-circle-outline" size={32} color="#F97316" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Viet - Eng</Text>
-                        <Text className="text-gray-500 text-sm">Ôn tập (Vietnamese to English)</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Active Recall</Text>
+                        <Text className="text-gray-500 text-sm">Strengthen your memory</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Spelling Practice */}
@@ -61,14 +63,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/spelling')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-purple-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="create-outline" size={32} color="#8B5CF6" />
+                    <View className="w-16 h-16 bg-purple-50 rounded-xl items-center justify-center mr-4 border border-purple-100">
+                        <Ionicons name="pencil-outline" size={30} color="#8B5CF6" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Spelling</Text>
-                        <Text className="text-gray-500 text-sm">Practice writing words</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Spelling Bee</Text>
+                        <Text className="text-gray-500 text-sm">Master correct writing</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Fill in the Blank */}
@@ -76,14 +78,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/fill-blank')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-blue-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="text-outline" size={32} color="#2563EB" />
+                    <View className="w-16 h-16 bg-indigo-50 rounded-xl items-center justify-center mr-4 border border-indigo-100">
+                        <Ionicons name="bulb-outline" size={30} color="#6366F1" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Fill in the Blank</Text>
-                        <Text className="text-gray-500 text-sm">Complete the sentence</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Context Master</Text>
+                        <Text className="text-gray-500 text-sm">Learn usage in sentences</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Multiple Choice */}
@@ -91,14 +93,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/multiple-choice')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-purple-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="list-outline" size={32} color="#9333EA" />
+                    <View className="w-16 h-16 bg-teal-50 rounded-xl items-center justify-center mr-4 border border-teal-100">
+                        <Ionicons name="checkmark-circle-outline" size={30} color="#14B8A6" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Multiple Choice</Text>
-                        <Text className="text-gray-500 text-sm">Choose the meaning</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Quick Quiz</Text>
+                        <Text className="text-gray-500 text-sm">Fast meaning check</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Reverse Multiple Choice */}
@@ -106,14 +108,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/reverse-multiple-choice')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-orange-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="swap-horizontal-outline" size={32} color="#EA580C" />
+                    <View className="w-16 h-16 bg-amber-50 rounded-xl items-center justify-center mr-4 border border-amber-100">
+                        <Ionicons name="search-outline" size={30} color="#F59E0B" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Reverse Choice</Text>
-                        <Text className="text-gray-500 text-sm">Find English word</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Word Hunter</Text>
+                        <Text className="text-gray-500 text-sm">Find the English term</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
                 {/* Feature Card: Word Match */}
@@ -121,28 +123,14 @@ export default function HomeScreen() {
                     onPress={() => router.push('/word-match')}
                     className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
                 >
-                    <View className="w-16 h-16 bg-pink-100 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="link-outline" size={32} color="#EC4899" />
+                    <View className="w-16 h-16 bg-pink-50 rounded-xl items-center justify-center mr-4 border border-pink-100">
+                        <Ionicons name="magnet-outline" size={30} color="#EC4899" />
                     </View>
                     <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-1">Word Match</Text>
-                        <Text className="text-gray-500 text-sm">Pair meanings</Text>
+                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Power Matching</Text>
+                        <Text className="text-gray-500 text-sm">Connect pairs rapidly</Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Placeholder */}
-                <TouchableOpacity
-                    disabled
-                    className="bg-gray-100 rounded-2xl p-4 mb-4 border border-gray-100 flex-row items-center opacity-60"
-                >
-                    <View className="w-16 h-16 bg-gray-200 rounded-xl items-center justify-center mr-4">
-                        <Ionicons name="lock-closed-outline" size={32} color="#9CA3AF" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-500 mb-1">Coming Soon</Text>
-                        <Text className="text-gray-400 text-sm">More features ahead</Text>
-                    </View>
+                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
                 </TouchableOpacity>
 
             </ScrollView>
