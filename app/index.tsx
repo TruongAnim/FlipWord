@@ -20,8 +20,11 @@ export default function HomeScreen() {
                     </View>
                     <Text className="text-slate-500 font-medium text-sm mt-2">Master your vocabulary daily</Text>
                 </View>
-                <TouchableOpacity className="p-2 bg-gray-50 rounded-full border border-gray-100">
-                    <Ionicons name="settings-outline" size={22} color="#475569" />
+                <TouchableOpacity
+                    className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm"
+                    onPress={() => router.push('/user-profile')}
+                >
+                    <Ionicons name="person" size={20} color="#2563EB" />
                 </TouchableOpacity>
             </View>
 

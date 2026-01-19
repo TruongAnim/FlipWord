@@ -5,6 +5,7 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
@@ -35,9 +36,11 @@ export default function MultipleChoiceScreen() {
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [score, setScore] = useState(0);
     const [isCompleted, setIsCompleted] = useState(false);
+    const startTimeRef = React.useRef<number>(Date.now());
 
     useEffect(() => {
         loadGame();
+        startTimeRef.current = Date.now();
     }, []);
 
     const loadGame = async () => {
@@ -76,6 +79,7 @@ export default function MultipleChoiceScreen() {
         const correct = option === currentQuestion.correctOption;
 
         setIsCorrect(correct);
+        trackingRepository.logAttempt(currentQuestion.targetWord.id, correct, 'multiple_choice');
         if (correct) {
             setScore(prev => prev + 1);
         }
@@ -86,6 +90,8 @@ export default function MultipleChoiceScreen() {
             setCurrentIndex(prev => prev + 1);
             resetRoundState();
         } else {
+            const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            trackingRepository.logSession(duration, 'multiple_choice');
             setIsCompleted(true);
         }
     };
@@ -149,7 +155,11 @@ export default function MultipleChoiceScreen() {
             {/* Timer Bar */}
             <GameTimer
                 duration={GameConfig.MULTIPLE_CHOICE_DURATION}
-                onTimeout={() => setIsCompleted(true)}
+                onTimeout={() => {
+                    const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+                    trackingRepository.logSession(duration, 'multiple_choice');
+                    setIsCompleted(true);
+                }}
                 isRunning={!loading && !isCompleted}
             />
 

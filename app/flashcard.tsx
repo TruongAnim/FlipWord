@@ -8,6 +8,7 @@ import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { trackingRepository } from '../data/repositories/TrackingRepository';
 
 const shuffleArray = (array: Word[]) => {
     let currentIndex = array.length, randomIndex;
@@ -31,9 +32,11 @@ export default function FlashcardScreen() {
     const [rememberedCount, setRememberedCount] = useState(0);
     const [forgotCount, setForgotCount] = useState(0);
     const [isCompleted, setIsCompleted] = useState(false);
+    const startTimeRef = React.useRef<number>(Date.now());
 
     useEffect(() => {
         loadWords();
+        startTimeRef.current = Date.now();
     }, [currentMode]);
 
     const loadWords = async () => {
@@ -45,17 +48,23 @@ export default function FlashcardScreen() {
 
     const handleSwipeRight = (word: Word) => {
         setRememberedCount(prev => prev + 1);
+        trackingRepository.logAttempt(word.id, true, currentMode === 'en-vi' ? 'flashcard' : 'active_recall');
     };
 
     const handleSwipeLeft = (word: Word) => {
         setForgotCount(prev => prev + 1);
+        trackingRepository.logAttempt(word.id, false, currentMode === 'en-vi' ? 'flashcard' : 'active_recall');
     };
 
     const handleFinish = () => {
+        const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        trackingRepository.logSession(duration, currentMode === 'en-vi' ? 'flashcard' : 'active_recall');
         setIsCompleted(true);
     };
 
     const handleTimeout = () => {
+        const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+        trackingRepository.logSession(duration, currentMode === 'en-vi' ? 'flashcard' : 'active_recall');
         setIsCompleted(true);
     };
 

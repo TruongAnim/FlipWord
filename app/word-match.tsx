@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View, Vibration, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
@@ -49,9 +50,11 @@ export default function WordMatchScreen() {
     // Animation Opacity Map: ID -> Animated.Value
     // We use a ref to hold animated values to persist them across renders without re-initializing
     const opacityMap = useRef<Map<string, Animated.Value>>(new Map()).current;
+    const startTimeRef = useRef<number>(Date.now());
 
     useEffect(() => {
         loadGame();
+        startTimeRef.current = Date.now();
     }, []);
 
     const getOpacity = (id: string) => {
@@ -120,6 +123,7 @@ export default function WordMatchScreen() {
     const handleMatch = (id: string) => {
         setSelectedItem(null);
         setCorrectCount(prev => prev + 1);
+        trackingRepository.logAttempt(id, true, 'word_match');
 
         // Start Fade Out
         const anim = getOpacity(id);
@@ -188,6 +192,8 @@ export default function WordMatchScreen() {
         // If no items left in slots
         const allNull = newEng.every(s => s === null) && newVi.every(s => s === null);
         if (allNull) {
+            const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            trackingRepository.logSession(duration, 'word_match');
             setIsCompleted(true);
         }
 
@@ -198,6 +204,15 @@ export default function WordMatchScreen() {
     const handleMismatch = () => {
         setMistakes(prev => prev + 1);
         Vibration.vibrate();
+        if (selectedItem) {
+            // Need to know WHICH word was wrong. In match logic, we have selectedItem and current item.
+            // But handleMismatch doesn't receive the item.
+            // Wait, handleSelect calls handleMismatch() if IDs don't match.
+            // We can't easily log *which* word was wrong if we don't pass it.
+            // But usually we assume the 'selectedItem' was the one the user was focusing on?
+            // Actually let's update handleMismatch to take the item ID if possible, but for now let's just log failure for 'selectedItem' if available.
+            trackingRepository.logAttempt(selectedItem.id, false, 'word_match');
+        }
         setSelectedItem(null);
     };
 
@@ -305,7 +320,11 @@ export default function WordMatchScreen() {
             {/* Timer Bar */}
             <GameTimer
                 duration={GameConfig.WORD_MATCH_DURATION}
-                onTimeout={() => setIsCompleted(true)}
+                onTimeout={() => {
+                    const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+                    trackingRepository.logSession(duration, 'word_match');
+                    setIsCompleted(true);
+                }}
                 isRunning={!loading && !isCompleted}
             />
 

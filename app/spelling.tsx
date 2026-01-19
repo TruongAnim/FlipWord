@@ -5,6 +5,7 @@ import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, ScrollView
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
@@ -30,9 +31,11 @@ export default function SpellingScreen() {
     const [incorrectCount, setIncorrectCount] = useState(0);
     const [isCompleted, setIsCompleted] = useState(false);
     const inputRef = useRef<TextInput>(null);
+    const startTimeRef = useRef<number>(Date.now());
 
     useEffect(() => {
         loadWords();
+        startTimeRef.current = Date.now();
     }, []);
 
     const loadWords = async () => {
@@ -52,8 +55,10 @@ export default function SpellingScreen() {
 
         if (isMatch) {
             setCorrectCount(prev => prev + 1);
+            trackingRepository.logAttempt(currentWord.id, true, 'spelling');
         } else {
             setIncorrectCount(prev => prev + 1);
+            trackingRepository.logAttempt(currentWord.id, false, 'spelling');
         }
 
         Keyboard.dismiss();
@@ -64,6 +69,8 @@ export default function SpellingScreen() {
             setCurrentIndex(prev => prev + 1);
             resetState();
         } else {
+            const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            trackingRepository.logSession(duration, 'spelling');
             setIsCompleted(true);
         }
     };
@@ -147,7 +154,11 @@ export default function SpellingScreen() {
                 {/* Timer Bar */}
                 <GameTimer
                     duration={GameConfig.SPELLING_DURATION}
-                    onTimeout={() => setIsCompleted(true)}
+                    onTimeout={() => {
+                        const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
+                        trackingRepository.logSession(duration, 'spelling');
+                        setIsCompleted(true);
+                    }}
                     isRunning={!loading && !isCompleted}
                 />
 
