@@ -81,7 +81,7 @@ export default function FlipCard({ word, displayMode = 'en-vi' }: FlipCardProps)
 
                 <Animated.View
                     style={[styles.card, backAnimatedStyle]}
-                    className="absolute w-full h-full bg-blue-500 rounded-3xl shadow-xl items-center justify-center p-6"
+                    className={`absolute w-full h-full rounded-3xl shadow-xl items-center justify-center p-6 ${displayMode === 'en-vi' ? 'bg-blue-500' : 'bg-orange-500'}`}
                 >
                     <BackContent />
                 </Animated.View>

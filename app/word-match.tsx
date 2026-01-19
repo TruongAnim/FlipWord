@@ -248,7 +248,7 @@ export default function WordMatchScreen() {
     const renderCard = (item: MatchItem | null, index: number) => {
         if (!item) {
             // Empty placeholder to keep layout stable
-            return <View key={`empty-${index}`} className="h-24 m-1" />;
+            return <View key={`empty-${index}`} className="min-h-[60px] m-1" />;
         }
 
         const isSelected = selectedItem?.side === item.side && selectedItem?.id === item.id;
@@ -278,9 +278,9 @@ export default function WordMatchScreen() {
                 <TouchableOpacity
                     onPress={() => handleSelect(item)}
                     disabled={isFading}
-                    className={`h-24 justify-center items-center rounded-xl border-2 shadow-sm p-2 m-1 ${bgStyle} ${borderStyle}`}
+                    className={`min-h-[60px] py-4 px-2 justify-center items-center rounded-xl border-2 shadow-sm m-1 ${bgStyle} ${borderStyle}`}
                 >
-                    <Text className={`text-center font-medium ${textStyle} ${item.text.length > 15 ? 'text-xs' : 'text-sm'}`}>
+                    <Text className={`text-center font-medium ${textStyle} ${item.text.length > 20 ? 'text-xs' : 'text-sm'}`}>
                         {item.text}
                     </Text>
                 </TouchableOpacity>
@@ -298,14 +298,8 @@ export default function WordMatchScreen() {
                     </TouchableOpacity>
                     <Text className="text-xl font-bold text-gray-800 ml-2">Power Matching</Text>
                 </View>
-
-                <View className="flex-row space-x-2 items-center">
-                    <View className="bg-white px-3 py-1 rounded-full border border-red-100">
-                        <Text className="text-red-500 font-bold text-xs">Mistakes: {mistakes}</Text>
-                    </View>
-                    <View className="bg-white px-3 py-1 rounded-full border border-green-100">
-                        <Text className="text-green-600 font-bold text-xs">Correct: {correctCount}/{totalPairs}</Text>
-                    </View>
+                <View className="flex-1 items-end">
+                    <Text className="text-pink-600 font-medium text-lg">{correctCount}/{totalPairs}</Text>
                 </View>
             </View>
 
@@ -325,6 +319,18 @@ export default function WordMatchScreen() {
                 {/* Right Column (Vietnamese) */}
                 <View className="flex-1 pl-1">
                     {vietnameseSlots.map((item, index) => renderCard(item, index))}
+                </View>
+            </View>
+
+            {/* Stats Footer */}
+            <View className="flex-row justify-between px-6 pb-6 pt-4 bg-white border-t border-gray-100">
+                <View className="flex-row items-center bg-red-50 px-4 py-2 rounded-full border border-red-100">
+                    <Ionicons name="alert-circle" size={18} color="#EF4444" style={{ marginRight: 6 }} />
+                    <Text className="text-red-600 font-bold">Mistakes: {mistakes}</Text>
+                </View>
+                <View className="flex-row items-center bg-green-50 px-4 py-2 rounded-full border border-green-100">
+                    <Ionicons name="checkmark-circle" size={18} color="#10B981" style={{ marginRight: 6 }} />
+                    <Text className="text-green-600 font-bold">Correct: {correctCount}/{totalPairs}</Text>
                 </View>
             </View>
 

@@ -106,20 +106,20 @@ export default function MultipleChoiceScreen() {
         return (
             <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
                 <View className="items-center w-full max-w-sm">
-                    <View className="mb-8 p-6 bg-purple-50 rounded-full">
-                        <Ionicons name="trophy" size={80} color="#8B5CF6" />
+                    <View className="mb-8 p-6 bg-teal-50 rounded-full">
+                        <Ionicons name="trophy" size={80} color="#0D9488" />
                     </View>
 
                     <Text className="text-3xl font-bold text-gray-800 mb-2">Quiz Complete!</Text>
                     <Text className="text-gray-500 text-center mb-8">You have finished the quiz.</Text>
 
-                    <View className="items-center bg-purple-50 p-6 rounded-2xl w-full mb-8">
+                    <View className="items-center bg-teal-50 p-6 rounded-2xl w-full mb-8">
                         <Text className="text-gray-600 mb-1">Your Score</Text>
-                        <Text className="text-5xl font-bold text-purple-600">{score} / {questions.length}</Text>
+                        <Text className="text-5xl font-bold text-teal-600">{score} / {questions.length}</Text>
                     </View>
 
                     <TouchableOpacity
-                        className="w-full bg-purple-600 py-4 rounded-xl shadow-md flex-row justify-center items-center"
+                        className="w-full bg-teal-600 py-4 rounded-xl shadow-md flex-row justify-center items-center"
                         onPress={() => router.back()}
                     >
                         <Ionicons name="home" size={20} color="white" style={{ marginRight: 8 }} />
@@ -133,15 +133,15 @@ export default function MultipleChoiceScreen() {
     const currentQuestion = questions[currentIndex];
 
     return (
-        <SafeAreaView className="flex-1 bg-purple-50">
+        <SafeAreaView className="flex-1 bg-teal-50">
             {/* Header */}
-            <View className="flex-row items-center px-4 py-2 bg-purple-50 z-10">
+            <View className="flex-row items-center px-4 py-2 bg-teal-50 z-10">
                 <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-white rounded-full shadow-sm">
-                    <Ionicons name="arrow-back" size={24} color="#7C3AED" />
+                    <Ionicons name="arrow-back" size={24} color="#0D9488" />
                 </TouchableOpacity>
                 <Text className="text-xl font-bold text-gray-800">Quick Quiz</Text>
                 <View className="flex-1 items-end">
-                    <Text className="text-purple-600 font-medium text-lg">{currentIndex + 1}/{questions.length}</Text>
+                    <Text className="text-teal-600 font-medium text-lg">{currentIndex + 1}/{questions.length}</Text>
                 </View>
             </View>
 
@@ -165,10 +165,10 @@ export default function MultipleChoiceScreen() {
                 {/* Example Reveal Area */}
                 {selectedOption !== null && (
                     <View className="bg-white/60 rounded-xl p-4 mb-8 border border-white/50">
-                        <Text className="text-purple-900 font-medium text-lg italic text-center mb-1">
+                        <Text className="text-teal-900 font-medium text-lg italic text-center mb-1">
                             "{currentQuestion.targetWord.example}"
                         </Text>
-                        <Text className="text-purple-500 text-sm text-center">
+                        <Text className="text-teal-500 text-sm text-center">
                             ({currentQuestion.targetWord.exampleMeaning})
                         </Text>
                     </View>
@@ -219,7 +219,7 @@ export default function MultipleChoiceScreen() {
                 <View className="p-4 bg-white border-t border-gray-100 absolute bottom-0 w-full pb-8 shadow-lg">
                     <TouchableOpacity
                         onPress={handleNext}
-                        className={`w-full py-4 rounded-xl flex-row justify-center items-center ${isCorrect ? 'bg-green-500' : 'bg-purple-500' // Purple on incorrect just to keep flow
+                        className={`w-full py-4 rounded-xl flex-row justify-center items-center ${isCorrect ? 'bg-green-500' : 'bg-teal-500' // Teal on incorrect
                             }`}
                     >
                         <Text className="text-white font-bold text-xl mr-2">Next Word</Text>

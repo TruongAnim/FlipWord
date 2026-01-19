@@ -39,24 +39,34 @@ export const GameTimer: React.FC<GameTimerProps> = ({ duration, onTimeout, isRun
     };
 
     // Determine color based on time left (urgency)
-    const getColor = () => {
-        if (timeLeft < 30) return 'text-red-600 bg-red-50 border-red-200';
-        if (timeLeft < 60) return 'text-orange-600 bg-orange-50 border-orange-200';
-        return 'text-blue-600 bg-blue-50 border-blue-200';
+    const getTheme = () => {
+        if (timeLeft > 120) return {
+            text: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200', icon: '#16A34A'
+        };
+        if (timeLeft > 60) return {
+            text: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200', icon: '#CA8A04'
+        };
+        if (timeLeft > 30) return {
+            text: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200', icon: '#EA580C'
+        };
+        // Critical (<= 30s)
+        return {
+            text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200', icon: '#DC2626'
+        };
     };
 
-    const style = getColor();
+    const theme = getTheme();
 
     return (
         <View className="w-full items-center py-2 bg-white">
-            <View className={`flex-row items-center px-6 py-2 rounded-full border ${style.split(' ').slice(1).join(' ')}`}>
+            <View className={`flex-row items-center px-6 py-2 rounded-full border ${theme.bg} ${theme.border}`}>
                 <Ionicons
                     name="time"
                     size={20}
-                    color={timeLeft < 30 ? '#DC2626' : timeLeft < 60 ? '#EA580C' : '#2563EB'}
+                    color={theme.icon}
                     style={{ marginRight: 8 }}
                 />
-                <Text className={`font-mono text-xl font-bold ${style.split(' ')[0]}`}>
+                <Text className={`font-mono text-xl font-bold ${theme.text}`}>
                     {formatTime(timeLeft)}
                 </Text>
             </View>
