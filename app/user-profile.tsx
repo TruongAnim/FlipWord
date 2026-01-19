@@ -186,11 +186,16 @@ export default function UserProfileScreen() {
     return (
         <SafeAreaView className="flex-1 bg-white">
             {/* Header */}
-            <View className="flex-row items-center px-4 py-2 mb-4">
-                <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-gray-50 rounded-full shadow-sm">
-                    <Ionicons name="arrow-back" size={24} color="#374151" />
+            <View className="flex-row items-center justify-between px-4 py-2 mb-4">
+                <View className="flex-row items-center">
+                    <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2 bg-gray-50 rounded-full shadow-sm">
+                        <Ionicons name="arrow-back" size={24} color="#374151" />
+                    </TouchableOpacity>
+                    <Text className="text-xl font-bold text-gray-800">Profile</Text>
+                </View>
+                <TouchableOpacity onPress={() => router.push('/settings' as any)} className="p-2 bg-gray-50 rounded-full shadow-sm">
+                    <Ionicons name="settings-outline" size={24} color="#374151" />
                 </TouchableOpacity>
-                <Text className="text-xl font-bold text-gray-800">Profile</Text>
             </View>
 
             <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 12 }}>
