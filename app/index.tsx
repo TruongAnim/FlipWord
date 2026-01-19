@@ -18,7 +18,7 @@ export default function HomeScreen() {
                         </View>
                         <Text className="text-2xl font-extrabold text-slate-800 tracking-tight">FlipWord</Text>
                     </View>
-                    <Text className="text-slate-500 font-medium text-sm">Master your vocabulary daily</Text>
+                    <Text className="text-slate-500 font-medium text-sm mt-2">Master your vocabulary daily</Text>
                 </View>
                 <TouchableOpacity className="p-2 bg-gray-50 rounded-full border border-gray-100">
                     <Ionicons name="settings-outline" size={22} color="#475569" />
