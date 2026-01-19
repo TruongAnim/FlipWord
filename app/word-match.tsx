@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View, Vibration, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { GameTimer } from '../components/GameTimer';
+import { GameConfig } from '../constants/GameConfig';
 
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
@@ -297,7 +299,7 @@ export default function WordMatchScreen() {
                     <Text className="text-xl font-bold text-gray-800 ml-2">Power Matching</Text>
                 </View>
 
-                <View className="flex-row space-x-2">
+                <View className="flex-row space-x-2 items-center">
                     <View className="bg-white px-3 py-1 rounded-full border border-red-100">
                         <Text className="text-red-500 font-bold text-xs">Mistakes: {mistakes}</Text>
                     </View>
@@ -306,6 +308,13 @@ export default function WordMatchScreen() {
                     </View>
                 </View>
             </View>
+
+            {/* Timer Bar */}
+            <GameTimer
+                duration={GameConfig.WORD_MATCH_DURATION}
+                onTimeout={() => setIsCompleted(true)}
+                isRunning={!loading && !isCompleted}
+            />
 
             <View className="flex-1 p-4 flex-row">
                 {/* Left Column (English) */}

@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SwipeDeck from '../components/Flashcard/SwipeDeck';
+import { GameTimer } from '../components/GameTimer';
+import { GameConfig } from '../constants/GameConfig';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
 
@@ -53,6 +55,10 @@ export default function FlashcardScreen() {
         setIsCompleted(true);
     };
 
+    const handleTimeout = () => {
+        setIsCompleted(true);
+    };
+
     if (isCompleted) {
         return (
             <SafeAreaView className="flex-1 bg-white items-center justify-center p-6">
@@ -99,10 +105,19 @@ export default function FlashcardScreen() {
                         {currentMode === 'en-vi' ? 'Essential Flashcards' : 'Active Recall'}
                     </Text>
                 </View>
-                <Text className="text-blue-600 font-medium">
-                    {rememberedCount + forgotCount}/{words.length}
-                </Text>
+                <View className="flex-row items-center gap-2">
+                    <Text className="text-blue-600 font-medium">
+                        {rememberedCount + forgotCount}/{words.length}
+                    </Text>
+                </View>
             </View>
+
+            {/* Timer Bar */}
+            <GameTimer
+                duration={GameConfig.FLASHCARD_DURATION}
+                onTimeout={handleTimeout}
+                isRunning={!loading && !isCompleted}
+            />
 
             <View className="flex-1 relative">
                 {loading ? (

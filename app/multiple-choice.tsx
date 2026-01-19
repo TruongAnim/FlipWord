@@ -5,6 +5,8 @@ import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Word } from '../data/models/Word';
 import { wordRepository } from '../data/repositories/WordRepository';
+import { GameTimer } from '../components/GameTimer';
+import { GameConfig } from '../constants/GameConfig';
 
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
@@ -139,9 +141,16 @@ export default function MultipleChoiceScreen() {
                 </TouchableOpacity>
                 <Text className="text-xl font-bold text-gray-800">Quick Quiz</Text>
                 <View className="flex-1 items-end">
-                    <Text className="text-purple-600 font-medium">{currentIndex + 1}/{questions.length}</Text>
+                    <Text className="text-purple-600 font-medium text-lg">{currentIndex + 1}/{questions.length}</Text>
                 </View>
             </View>
+
+            {/* Timer Bar */}
+            <GameTimer
+                duration={GameConfig.MULTIPLE_CHOICE_DURATION}
+                onTimeout={() => setIsCompleted(true)}
+                isRunning={!loading && !isCompleted}
+            />
 
             <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
 
