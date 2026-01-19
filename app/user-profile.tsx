@@ -142,8 +142,8 @@ export default function UserProfileScreen() {
                     <Text className="text-gray-500">Keep up the good work!</Text>
                 </View>
 
-                {/* Filters */}
-                <View className="flex-row mb-8 bg-gray-50 p-1 rounded-xl">
+                {/* Filters - Temporarily Disabled */}
+                {/* <View className="flex-row mb-8 bg-gray-50 p-1 rounded-xl">
                     {FILTERS.map((f) => (
                         <TouchableOpacity
                             key={f.value}
@@ -155,7 +155,7 @@ export default function UserProfileScreen() {
                             </Text>
                         </TouchableOpacity>
                     ))}
-                </View>
+                </View> */}
 
                 {/* Time Studied Banner */}
                 {/* Time Studied Banner */}
