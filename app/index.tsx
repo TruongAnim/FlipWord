@@ -1,172 +1,111 @@
-import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    Easing,
+    withDelay,
+    runOnJS
+} from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 
-export default function HomeScreen() {
+const { width } = Dimensions.get('window');
+
+export default function SplashScreen() {
     const router = useRouter();
-    const [avatarUri, setAvatarUri] = React.useState<string | null>(null);
+    const progress = useSharedValue(0);
+    const opacity = useSharedValue(0);
+    const scale = useSharedValue(0.8);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            loadAvatar();
-        }, [])
-    );
+    useEffect(() => {
+        // Start animations
+        opacity.value = withTiming(1, { duration: 800 });
+        scale.value = withTiming(1, {
+            duration: 800,
+            easing: Easing.out(Easing.back(1.5))
+        });
 
-    const loadAvatar = async () => {
-        try {
-            const savedUri = await AsyncStorage.getItem('user_avatar_uri');
-            if (savedUri) {
-                setAvatarUri(savedUri);
+        // Progress bar animation
+        progress.value = withTiming(width * 0.7, {
+            duration: 1200,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        }, (finished) => {
+            if (finished) {
+                runOnJS(navigateToHome)();
             }
-        } catch (error) {
-            console.error('Failed to load avatar:', error);
-        }
+        });
+    }, []);
+
+    const navigateToHome = () => {
+        router.replace('/home');
     };
 
+    const animatedLogoStyle = useAnimatedStyle(() => {
+        return {
+            opacity: opacity.value,
+            transform: [{ scale: scale.value }],
+        };
+    });
+
+    const animatedProgressStyle = useAnimatedStyle(() => {
+        return {
+            width: progress.value,
+        };
+    });
+
     return (
-        <SafeAreaView className="flex-1 bg-white">
-            {/* App Bar */}
-            <View className="flex-row justify-between items-start px-6 pt-4 pb-6 bg-white border-b border-gray-100">
-                <View>
-                    <View className="flex-row items-center gap-2 mb-1">
-                        <View className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center shadow-sm">
-                            <Ionicons name="book" size={18} color="white" />
-                        </View>
-                        <Text className="text-2xl font-extrabold text-slate-800 tracking-tight">FlipWord</Text>
-                    </View>
-                    <Text className="text-slate-500 font-medium text-sm mt-2">Master your vocabulary daily</Text>
+        <SafeAreaView className="flex-1 bg-white items-center justify-between py-12">
+            <StatusBar style="dark" />
+
+            {/* Top Spacer */}
+            <View />
+
+            {/* Center Content: Logo & Name */}
+            <Animated.View style={[styles.centerContainer, animatedLogoStyle]}>
+                <View className="w-32 h-32 bg-white rounded-3xl shadow-lg shadow-blue-200 items-center justify-center mb-6 border border-blue-50">
+                    {/* Using the icon as logo */}
+                    <Image
+                        source={require('../assets/images/icon.png')}
+                        style={{ width: 100, height: 100, borderRadius: 20 }}
+                        contentFit="contain"
+                    />
                 </View>
-                <TouchableOpacity
-                    className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm overflow-hidden"
-                    onPress={() => router.push('/user-profile')}
-                >
-                    {avatarUri ? (
-                        <Image
-                            source={{ uri: avatarUri }}
-                            style={{ width: '100%', height: '100%' }}
-                            contentFit="cover"
-                        />
-                    ) : (
-                        <Ionicons name="person" size={20} color="#2563EB" />
-                    )}
-                </TouchableOpacity>
+
+                <Text className="text-4xl font-extrabold text-blue-600 tracking-tighter">
+                    FlipWord
+                </Text>
+                <Text className="text-slate-400 font-medium text-lg mt-2 tracking-wide">
+                    Master Vocabulary Daily
+                </Text>
+            </Animated.View>
+
+            {/* Footer: Progress Bar */}
+            <View className="mb-10 w-full items-center">
+                <View className="flex-row items-center mb-3">
+                    <Text className="text-slate-400 text-xs font-semibold uppercase tracking-widest mr-2">Loading values</Text>
+                </View>
+
+                {/* Progress Track */}
+                <View className="h-2 bg-slate-100 rounded-full overflow-hidden" style={{ width: width * 0.7 }}>
+                    {/* Progress Indicator */}
+                    <Animated.View className="h-full bg-blue-500 rounded-full" style={animatedProgressStyle} />
+                </View>
+
+                <Text className="text-slate-300 text-[10px] mt-4">
+                    v1.0.0
+                </Text>
             </View>
-
-            {/* Content */}
-            <ScrollView className="flex-1 bg-gray-50 px-4 pt-6" contentContainerStyle={{ paddingBottom: 40 }}>
-
-                {/* Feature Card: Flashcard (En-Vi) */}
-                <TouchableOpacity
-                    onPress={() => router.push('/flashcard?mode=en-vi')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-blue-50 rounded-xl items-center justify-center mr-4 border border-blue-100">
-                        <Ionicons name="library-outline" size={30} color="#3B82F6" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Essential Flashcards</Text>
-                        <Text className="text-gray-500 text-sm">Build your vocabulary foundation</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Flashcard (Vi-En) */}
-                <TouchableOpacity
-                    onPress={() => router.push('/flashcard?mode=vi-en')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-orange-50 rounded-xl items-center justify-center mr-4 border border-orange-100">
-                        <Ionicons name="refresh-circle-outline" size={32} color="#F97316" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Active Recall</Text>
-                        <Text className="text-gray-500 text-sm">Strengthen your memory</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Spelling Practice */}
-                <TouchableOpacity
-                    onPress={() => router.push('/spelling')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-purple-50 rounded-xl items-center justify-center mr-4 border border-purple-100">
-                        <Ionicons name="pencil-outline" size={30} color="#8B5CF6" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Spelling Bee</Text>
-                        <Text className="text-gray-500 text-sm">Master correct writing</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Fill in the Blank */}
-                <TouchableOpacity
-                    onPress={() => router.push('/fill-blank')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-indigo-50 rounded-xl items-center justify-center mr-4 border border-indigo-100">
-                        <Ionicons name="bulb-outline" size={30} color="#6366F1" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Context Master</Text>
-                        <Text className="text-gray-500 text-sm">Learn usage in sentences</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Multiple Choice */}
-                <TouchableOpacity
-                    onPress={() => router.push('/multiple-choice')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-teal-50 rounded-xl items-center justify-center mr-4 border border-teal-100">
-                        <Ionicons name="checkmark-circle-outline" size={30} color="#14B8A6" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Quick Quiz</Text>
-                        <Text className="text-gray-500 text-sm">Fast meaning check</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Reverse Multiple Choice */}
-                <TouchableOpacity
-                    onPress={() => router.push('/reverse-multiple-choice')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-amber-50 rounded-xl items-center justify-center mr-4 border border-amber-100">
-                        <Ionicons name="search-outline" size={30} color="#F59E0B" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Word Hunter</Text>
-                        <Text className="text-gray-500 text-sm">Find the English term</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-                {/* Feature Card: Word Match */}
-                <TouchableOpacity
-                    onPress={() => router.push('/word-match')}
-                    className="bg-white rounded-2xl p-4 shadow-sm mb-4 border border-gray-100 flex-row items-center"
-                >
-                    <View className="w-16 h-16 bg-pink-50 rounded-xl items-center justify-center mr-4 border border-pink-100">
-                        <Ionicons name="magnet-outline" size={30} color="#EC4899" />
-                    </View>
-                    <View className="flex-1">
-                        <Text className="text-lg font-bold text-gray-800 mb-0.5">Power Matching</Text>
-                        <Text className="text-gray-500 text-sm">Connect pairs rapidly</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={20} color="#CBD5E1" />
-                </TouchableOpacity>
-
-            </ScrollView>
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    centerContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+});
