@@ -5,6 +5,10 @@ import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View
 import { LineChart } from "react-native-chart-kit";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { trackingRepository, ProgressRecord, SessionRecord } from '../data/repositories/TrackingRepository';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system/legacy';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'expo-image';
 
 const POSITIVE_QUOTES = [
     "You have studied for {minutes} minutes! Consistency is key.",
@@ -32,16 +36,19 @@ const FILTERS: { label: string; value: TimeFilter }[] = [
     { label: 'Month', value: 'last_month' },
 ];
 
+const AVATAR_URI_KEY = 'user_avatar_uri';
+
 export default function UserProfileScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<TimeFilter>('all');
+    const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
     const [stats, setStats] = useState({
         wordsLearned: 0,
         sessionsCompleted: 0,
         timeStudiedMinutes: 0,
-        todayMinutes: 0, // New Field
+        todayMinutes: 0,
         wordsRemembered: 0,
         wordsMastered: 0,
     });
@@ -59,7 +66,52 @@ export default function UserProfileScreen() {
 
     useEffect(() => {
         loadStats();
+        loadAvatar();
     }, [filter]);
+
+    const loadAvatar = async () => {
+        try {
+            const savedUri = await AsyncStorage.getItem(AVATAR_URI_KEY);
+            if (savedUri) {
+                setAvatarUri(savedUri);
+            }
+        } catch (error) {
+            console.error('Failed to load avatar:', error);
+        }
+    };
+
+    const handlePickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: 'images',
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+            });
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                const selectedUri = result.assets[0].uri;
+
+                // Save to local filesystem
+                if (FileSystem.documentDirectory) {
+                    const filename = 'user_avatar.jpg';
+                    const fileUri = FileSystem.documentDirectory + filename;
+
+                    await FileSystem.copyAsync({
+                        from: selectedUri,
+                        to: fileUri
+                    });
+
+                    // Add timestamp to force reload if needed
+                    const finalUri = `${fileUri}?t=${Date.now()}`;
+
+                    setAvatarUri(finalUri);
+                    await AsyncStorage.setItem(AVATAR_URI_KEY, finalUri);
+                }
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+        }
+    };
 
     const loadStats = async () => {
         setLoading(true);
@@ -88,8 +140,7 @@ export default function UserProfileScreen() {
         const todaySeconds = todaySessions.reduce((acc, s) => acc + (s.durationSeconds || 0), 0);
         const todayMinutes = Math.floor(todaySeconds / 60);
 
-        // Update Quote based on the Filtered Time (or could be today, but user asked for filtered context primarily in banner, 
-        // but let's base 'motivation' on the filtered view result).
+        // Update Quote based on the Filtered Time
         setQuote(getRandomQuote(timeStudiedMinutes));
 
         // Word Aggregation
@@ -114,8 +165,6 @@ export default function UserProfileScreen() {
             if (count >= 3) remembered++;
             if (count >= 5) mastered++;
         });
-
-
 
         setStats({
             wordsLearned: learned,
@@ -163,8 +212,6 @@ export default function UserProfileScreen() {
         });
 
         // Flatten to arrays
-        // We iterate based on the init loop order, but map keys iteration order is insertion order in simple cases, 
-        // better to re-iterate the 7 days to match labels index.
         for (let i = 6; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
@@ -202,9 +249,23 @@ export default function UserProfileScreen() {
 
                 {/* User Info */}
                 <View className="items-center mb-8">
-                    <View className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-md mb-4">
-                        <Ionicons name="person" size={48} color="#3B82F6" />
-                    </View>
+                    <TouchableOpacity
+                        onPress={handlePickImage}
+                        className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-md mb-4 overflow-hidden relative"
+                    >
+                        {avatarUri ? (
+                            <Image
+                                source={{ uri: avatarUri }}
+                                style={{ width: '100%', height: '100%' }}
+                                contentFit="cover"
+                            />
+                        ) : (
+                            <Ionicons name="person" size={48} color="#3B82F6" />
+                        )}
+                        <View className="absolute bottom-0 right-0 left-0 h-6 bg-black/20 items-center justify-center">
+                            <Ionicons name="camera" size={12} color="white" />
+                        </View>
+                    </TouchableOpacity>
                     <Text className="text-2xl font-bold text-gray-800">Learner</Text>
                     <Text className="text-gray-500">Keep up the good work!</Text>
                 </View>
