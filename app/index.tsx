@@ -4,8 +4,30 @@ import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'expo-image';
+
 export default function HomeScreen() {
     const router = useRouter();
+    const [avatarUri, setAvatarUri] = React.useState<string | null>(null);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            loadAvatar();
+        }, [])
+    );
+
+    const loadAvatar = async () => {
+        try {
+            const savedUri = await AsyncStorage.getItem('user_avatar_uri');
+            if (savedUri) {
+                setAvatarUri(savedUri);
+            }
+        } catch (error) {
+            console.error('Failed to load avatar:', error);
+        }
+    };
 
     return (
         <SafeAreaView className="flex-1 bg-white">
@@ -21,10 +43,18 @@ export default function HomeScreen() {
                     <Text className="text-slate-500 font-medium text-sm mt-2">Master your vocabulary daily</Text>
                 </View>
                 <TouchableOpacity
-                    className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm"
+                    className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm overflow-hidden"
                     onPress={() => router.push('/user-profile')}
                 >
-                    <Ionicons name="person" size={20} color="#2563EB" />
+                    {avatarUri ? (
+                        <Image
+                            source={{ uri: avatarUri }}
+                            style={{ width: '100%', height: '100%' }}
+                            contentFit="cover"
+                        />
+                    ) : (
+                        <Ionicons name="person" size={20} color="#2563EB" />
+                    )}
                 </TouchableOpacity>
             </View>
 

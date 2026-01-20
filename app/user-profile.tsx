@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View, Modal, TextInput } from 'react-native';
 import { LineChart } from "react-native-chart-kit";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { trackingRepository, ProgressRecord, SessionRecord } from '../data/repositories/TrackingRepository';
@@ -37,12 +37,16 @@ const FILTERS: { label: string; value: TimeFilter }[] = [
 ];
 
 const AVATAR_URI_KEY = 'user_avatar_uri';
+const USER_NAME_KEY = 'user_name';
 
 export default function UserProfileScreen() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<TimeFilter>('all');
     const [avatarUri, setAvatarUri] = useState<string | null>(null);
+    const [userName, setUserName] = useState("Learner");
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [tempName, setTempName] = useState("");
 
     const [stats, setStats] = useState({
         wordsLearned: 0,
@@ -67,7 +71,32 @@ export default function UserProfileScreen() {
     useEffect(() => {
         loadStats();
         loadAvatar();
+        loadUserName();
     }, [filter]);
+
+    const loadUserName = async () => {
+        try {
+            const savedName = await AsyncStorage.getItem(USER_NAME_KEY);
+            if (savedName) {
+                setUserName(savedName);
+                setTempName(savedName);
+            }
+        } catch (error) {
+            console.error('Failed to load user name:', error);
+        }
+    }
+
+    const handleSaveName = async () => {
+        if (tempName.trim().length === 0) return;
+
+        try {
+            await AsyncStorage.setItem(USER_NAME_KEY, tempName.trim());
+            setUserName(tempName.trim());
+            setEditModalVisible(false);
+        } catch (error) {
+            console.error('Failed to save user name:', error);
+        }
+    };
 
     const loadAvatar = async () => {
         try {
@@ -266,9 +295,59 @@ export default function UserProfileScreen() {
                             <Ionicons name="camera" size={12} color="white" />
                         </View>
                     </TouchableOpacity>
-                    <Text className="text-2xl font-bold text-gray-800">Learner</Text>
+
+                    <TouchableOpacity
+                        className="flex-row items-center gap-2 mb-1"
+                        onPress={() => setEditModalVisible(true)}
+                    >
+                        <Text className="text-2xl font-bold text-gray-800">{userName}</Text>
+                        <Ionicons name="pencil" size={18} color="#9CA3AF" />
+                    </TouchableOpacity>
+
                     <Text className="text-gray-500">Keep up the good work!</Text>
                 </View>
+
+                {/* Edit Name Modal */}
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={editModalVisible}
+                    onRequestClose={() => setEditModalVisible(false)}
+                >
+                    <View className="flex-1 bg-black/50 items-center justify-center p-4">
+                        <View className="bg-white p-6 rounded-2xl w-full max-w-sm shadow-xl">
+                            <Text className="text-xl font-bold text-gray-800 mb-4">Edit Name</Text>
+
+                            <TextInput
+                                className="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-6 text-[18px] text-gray-800"
+                                value={tempName}
+                                onChangeText={setTempName}
+                                autoFocus
+                                placeholder="Enter your name"
+                                placeholderTextColor="#9CA3AF"
+                            />
+
+                            <View className="flex-row gap-3">
+                                <TouchableOpacity
+                                    className="flex-1 bg-gray-100 p-4 rounded-xl items-center"
+                                    onPress={() => {
+                                        setEditModalVisible(false);
+                                        setTempName(userName); // Reset to current name
+                                    }}
+                                >
+                                    <Text className="font-bold text-gray-600">Cancel</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    className="flex-1 bg-blue-500 p-4 rounded-xl items-center shadow-sm"
+                                    onPress={handleSaveName}
+                                >
+                                    <Text className="font-bold text-white">Save</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
 
                 {/* Filters - Temporarily Disabled */}
                 {/* <View className="flex-row mb-8 bg-gray-50 p-1 rounded-xl">
