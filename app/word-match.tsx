@@ -8,6 +8,8 @@ import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -21,7 +23,7 @@ const shuffleArray = (array: any[]) => {
 interface MatchItem {
     id: string; // The Word ID
     text: string;
-    side: 'english' | 'vietnamese';
+    side: 'english' | 'definition';
 }
 
 const MATCH_FADE_OUT_DURATION = 4000;
@@ -29,6 +31,7 @@ const NEW_WORD_FADE_IN_DURATION = 300;
 
 export default function WordMatchScreen() {
     const router = useRouter();
+    const { getWordDefinition, language } = useLanguage();
     const [loading, setLoading] = useState(true);
 
     // Data Queues
@@ -37,7 +40,7 @@ export default function WordMatchScreen() {
     // Slots (Fixed size 6)
     // We store the MatchItem directly. If null, slot is empty.
     const [englishSlots, setEnglishSlots] = useState<(MatchItem | null)[]>([]);
-    const [vietnameseSlots, setVietnameseSlots] = useState<(MatchItem | null)[]>([]);
+    const [definitionSlots, setDefinitionSlots] = useState<(MatchItem | null)[]>([]);
 
     // Game State
     const [selectedItem, setSelectedItem] = useState<MatchItem | null>(null);
@@ -55,7 +58,7 @@ export default function WordMatchScreen() {
     useEffect(() => {
         loadGame();
         startTimeRef.current = Date.now();
-    }, []);
+    }, [language]);
 
     const getOpacity = (id: string) => {
         if (!opacityMap.has(id)) {
@@ -81,10 +84,10 @@ export default function WordMatchScreen() {
         // English[0] might match Vietnamese[3].
 
         const eng: MatchItem[] = initialWords.map(w => ({ id: w.id, text: w.english, side: 'english' }));
-        const vi: MatchItem[] = initialWords.map(w => ({ id: w.id, text: w.vietnamese.split(',')[0].trim(), side: 'vietnamese' }));
+        const def: MatchItem[] = initialWords.map(w => ({ id: w.id, text: getWordDefinition(w).split(',')[0].trim(), side: 'definition' }));
 
         setEnglishSlots(shuffleArray([...eng]));
-        setVietnameseSlots(shuffleArray([...vi]));
+        setDefinitionSlots(shuffleArray([...def]));
 
         setFadingIds(new Set());
         setMistakes(0);
@@ -156,14 +159,14 @@ export default function WordMatchScreen() {
 
         let shouldComplete = false;
 
-        const updateSlot = (slots: (MatchItem | null)[], side: 'english' | 'vietnamese') => {
+        const updateSlot = (slots: (MatchItem | null)[], side: 'english' | 'definition') => {
             return slots.map(slot => {
                 if (slot && slot.id === oldId) {
                     if (newWordData) {
                         // Replace with new word
                         const newItem: MatchItem = side === 'english'
                             ? { id: newWordData.id, text: newWordData.english, side }
-                            : { id: newWordData.id, text: newWordData.vietnamese.split(',')[0].trim(), side };
+                            : { id: newWordData.id, text: getWordDefinition(newWordData).split(',')[0].trim(), side };
 
                         // Reset opacity for new ID
                         getOpacity(newWordData.id).setValue(0);
@@ -183,14 +186,14 @@ export default function WordMatchScreen() {
         };
 
         const newEng = updateSlot(englishSlots, 'english');
-        const newVi = updateSlot(vietnameseSlots, 'vietnamese');
+        const newDef = updateSlot(definitionSlots, 'definition');
 
         setEnglishSlots(newEng);
-        setVietnameseSlots(newVi);
+        setDefinitionSlots(newDef);
 
         // Check completion
         // If no items left in slots
-        const allNull = newEng.every(s => s === null) && newVi.every(s => s === null);
+        const allNull = newEng.every(s => s === null) && newDef.every(s => s === null);
         if (allNull) {
             const duration = Math.floor((Date.now() - startTimeRef.current) / 1000);
             trackingRepository.logSession(duration, 'word_match');
@@ -334,9 +337,9 @@ export default function WordMatchScreen() {
                     {englishSlots.map((item, index) => renderCard(item, index))}
                 </View>
 
-                {/* Right Column (Vietnamese) */}
+                {/* Right Column (Definitions) */}
                 <View className="flex-1 pl-1">
-                    {vietnameseSlots.map((item, index) => renderCard(item, index))}
+                    {definitionSlots.map((item, index) => renderCard(item, index))}
                 </View>
             </View>
 

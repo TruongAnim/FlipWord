@@ -9,6 +9,8 @@ import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const shuffleArray = (array: Word[]) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -21,6 +23,7 @@ const shuffleArray = (array: Word[]) => {
 
 export default function SpellingScreen() {
     const router = useRouter();
+    const { getWordDefinition, getWordExampleMeaning, language } = useLanguage();
     const [words, setWords] = useState<Word[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -36,7 +39,7 @@ export default function SpellingScreen() {
     useEffect(() => {
         loadWords();
         startTimeRef.current = Date.now();
-    }, []);
+    }, [language]);
 
     const loadWords = async () => {
         setLoading(true);
@@ -186,14 +189,14 @@ export default function SpellingScreen() {
                         </View>
 
                         <Text className="text-3xl font-bold text-gray-800 text-center mb-6 leading-tight">
-                            {currentWord.vietnamese.split(',')[0].trim()}
+                            {getWordDefinition(currentWord).split(',')[0].trim()}
                         </Text>
 
                         <View className="bg-purple-50 w-full p-4 rounded-xl">
                             <Text className="text-lg text-purple-900 text-center font-medium opacity-80 italic">
                                 "{status === 'idle' ? getMaskedSentence(currentWord) : currentWord.example}"
                             </Text>
-                            <Text className="text-xs text-center text-purple-400 mt-2">({currentWord.exampleMeaning})</Text>
+                            <Text className="text-xs text-center text-purple-400 mt-2">({getWordExampleMeaning(currentWord)})</Text>
                         </View>
                     </View>
 

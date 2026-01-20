@@ -9,6 +9,8 @@ import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -21,12 +23,13 @@ const shuffleArray = (array: any[]) => {
 
 interface Question {
     targetWord: Word;
-    options: string[]; // List of 4 vietnamese meanings
+    options: string[];
     correctOption: string;
 }
 
 export default function MultipleChoiceScreen() {
     const router = useRouter();
+    const { getWordDefinition, getWordExampleMeaning, language } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,7 +44,7 @@ export default function MultipleChoiceScreen() {
     useEffect(() => {
         loadGame();
         startTimeRef.current = Date.now();
-    }, []);
+    }, [language]); // Reload when language changes
 
     const loadGame = async () => {
         setLoading(true);
@@ -53,10 +56,10 @@ export default function MultipleChoiceScreen() {
         const newQuestions: Question[] = targetWords.map((targetWord) => {
             // Pick 3 random distractors
             const otherWords = allWords.filter(w => w.id !== targetWord.id);
-            const distractors = shuffleArray(otherWords).slice(0, 3).map(w => w.vietnamese.split(',')[0].trim());
+            const distractors = shuffleArray(otherWords).slice(0, 3).map(w => getWordDefinition(w).split(',')[0].trim());
 
             // Primary meaning of target word
-            const targetMeaning = targetWord.vietnamese.split(',')[0].trim();
+            const targetMeaning = getWordDefinition(targetWord).split(',')[0].trim();
 
             const options = shuffleArray([targetMeaning, ...distractors]);
 
@@ -180,7 +183,7 @@ export default function MultipleChoiceScreen() {
                             "{currentQuestion.targetWord.example}"
                         </Text>
                         <Text className="text-teal-500 text-sm text-center">
-                            ({currentQuestion.targetWord.exampleMeaning})
+                            ({getWordExampleMeaning(currentQuestion.targetWord)})
                         </Text>
                     </View>
                 )}

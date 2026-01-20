@@ -9,6 +9,8 @@ import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -27,6 +29,7 @@ interface Question {
 
 export default function ReverseMultipleChoiceScreen() {
     const router = useRouter();
+    const { getWordDefinition, getWordExampleMeaning, language } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -41,7 +44,7 @@ export default function ReverseMultipleChoiceScreen() {
     useEffect(() => {
         loadGame();
         startTimeRef.current = Date.now();
-    }, []);
+    }, [language]);
 
     const loadGame = async () => {
         setLoading(true);
@@ -168,7 +171,7 @@ export default function ReverseMultipleChoiceScreen() {
                 {/* Question Card */}
                 <View className="bg-white rounded-3xl p-8 shadow-md border-b-4 border-gray-100 mb-8 min-h-[160px] justify-center items-center">
                     <Text className="text-3xl text-gray-800 font-bold text-center tracking-wide leading-tight">
-                        {currentQuestion.targetWord.vietnamese.split(',')[0].trim()}
+                        {getWordDefinition(currentQuestion.targetWord).split(',')[0].trim()}
                     </Text>
                     <Text className="text-gray-400 mt-4 font-medium uppercase tracking-wider text-xs">Choose the English word</Text>
                 </View>
@@ -180,7 +183,7 @@ export default function ReverseMultipleChoiceScreen() {
                             "{currentQuestion.targetWord.example}"
                         </Text>
                         <Text className="text-orange-700 text-sm text-center">
-                            ({currentQuestion.targetWord.exampleMeaning})
+                            ({getWordExampleMeaning(currentQuestion.targetWord)})
                         </Text>
                     </View>
                 )}

@@ -9,6 +9,8 @@ import { trackingRepository } from '../data/repositories/TrackingRepository';
 import { GameTimer } from '../components/GameTimer';
 import { GameConfig } from '../constants/GameConfig';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const shuffleArray = (array: any[]) => {
     let currentIndex = array.length, randomIndex;
     while (currentIndex !== 0) {
@@ -19,7 +21,7 @@ const shuffleArray = (array: any[]) => {
     return array;
 };
 
-// Interface for a single question round
+// Interface for a single Question round
 interface Question {
     targetWord: Word;
     options: string[]; // List of 4 english words
@@ -28,6 +30,7 @@ interface Question {
 
 export default function FillBlankScreen() {
     const router = useRouter();
+    const { getWordExampleMeaning, language } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +45,7 @@ export default function FillBlankScreen() {
     useEffect(() => {
         loadGame();
         startTimeRef.current = Date.now();
-    }, []);
+    }, [language]);
 
     const loadGame = async () => {
         setLoading(true);
@@ -192,7 +195,7 @@ export default function FillBlankScreen() {
                 {/* Sentence Card */}
                 <View className="bg-white rounded-3xl p-6 shadow-md border-b-4 border-gray-100 mb-8 min-h-[200px] justify-center">
                     <Text className="text-lg text-gray-500 font-medium mb-6 text-center italic">
-                        "{currentQuestion.targetWord.exampleMeaning}"
+                        "{getWordExampleMeaning(currentQuestion.targetWord)}"
                     </Text>
 
                     <View className="flex-row flex-wrap justify-center items-end">
