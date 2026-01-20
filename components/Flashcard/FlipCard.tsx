@@ -8,6 +8,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Word } from '../../data/models/Word';
 
+import { useLanguage } from '../../contexts/LanguageContext';
+
 interface FlipCardProps {
     word: Word;
     displayMode?: 'en-vi' | 'vi-en';
@@ -15,6 +17,7 @@ interface FlipCardProps {
 
 export default function FlipCard({ word, displayMode = 'en-vi' }: FlipCardProps) {
     const isFlipped = useSharedValue(0);
+    const { getWordDefinition, getWordExampleMeaning } = useLanguage();
 
     const handlePress = () => {
         isFlipped.value = withTiming(isFlipped.value ? 0 : 1, { duration: 300 });
@@ -44,17 +47,18 @@ export default function FlipCard({ word, displayMode = 'en-vi' }: FlipCardProps)
         if (displayMode === 'en-vi') {
             return <Text className="text-4xl font-bold text-gray-800 text-center">{word.english}</Text>;
         }
-        return <Text className="text-4xl font-bold text-gray-800 text-center">{word.vietnamese.split(',')[0].trim()}</Text>;
+        // For 'vi-en' (definition-to-english), show the definition in selected language
+        return <Text className="text-3xl font-bold text-gray-800 text-center">{getWordDefinition(word).split(',')[0].trim()}</Text>;
     };
 
     const BackContent = () => {
         if (displayMode === 'en-vi') {
             return (
                 <>
-                    <Text className="text-3xl font-bold text-white mb-2 text-center">{word.vietnamese.split(',')[0].trim()}</Text>
+                    <Text className="text-3xl font-bold text-white mb-2 text-center">{getWordDefinition(word).split(',')[0].trim()}</Text>
                     <View className="w-16 h-1 bg-white/30 rounded-full my-4" />
                     <Text className="text-lg text-white font-medium text-center italic">"{word.example}"</Text>
-                    <Text className="text-sm text-blue-100 text-center mt-2">({word.exampleMeaning})</Text>
+                    <Text className="text-sm text-blue-100 text-center mt-2">({getWordExampleMeaning(word)})</Text>
                 </>
             )
         }
@@ -63,7 +67,7 @@ export default function FlipCard({ word, displayMode = 'en-vi' }: FlipCardProps)
                 <Text className="text-3xl font-bold text-white mb-2 text-center">{word.english}</Text>
                 <View className="w-16 h-1 bg-white/30 rounded-full my-4" />
                 <Text className="text-lg text-white font-medium text-center italic">"{word.example}"</Text>
-                <Text className="text-sm text-blue-100 text-center mt-2">({word.exampleMeaning})</Text>
+                <Text className="text-sm text-blue-100 text-center mt-2">({getWordExampleMeaning(word)})</Text>
             </>
         )
     };
