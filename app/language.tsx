@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,15 +8,22 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 export default function LanguageScreen() {
     const router = useRouter();
+    const { initial } = useLocalSearchParams<{ initial: string }>();
+    const isInitial = initial === 'true';
+
     const { language, setLanguage } = useLanguage();
     const [selectedCode, setSelectedCode] = React.useState(language);
 
     const hasChanges = selectedCode !== language;
 
     const handleSave = () => {
-        if (hasChanges) {
+        if (hasChanges || isInitial) {
             setLanguage(selectedCode);
-            router.back();
+            if (isInitial) {
+                router.replace('/home');
+            } else {
+                router.back();
+            }
         }
     };
 
@@ -25,21 +32,25 @@ export default function LanguageScreen() {
             {/* Header */}
             <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm z-10">
                 <View className="flex-row items-center">
-                    <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2">
-                        <Ionicons name="arrow-back" size={24} color="#374151" />
-                    </TouchableOpacity>
-                    <Text className="text-xl font-bold text-gray-800">Language</Text>
+                    {!isInitial && (
+                        <TouchableOpacity onPress={() => router.back()} className="p-2 mr-2">
+                            <Ionicons name="arrow-back" size={24} color="#374151" />
+                        </TouchableOpacity>
+                    )}
+                    <Text className="text-xl font-bold text-gray-800">
+                        {isInitial ? 'Select Language' : 'Language'}
+                    </Text>
                 </View>
 
                 <TouchableOpacity
                     onPress={handleSave}
-                    disabled={!hasChanges}
+                    disabled={!hasChanges && !isInitial}
                     className="p-2"
                 >
                     <Ionicons
-                        name="checkmark"
+                        name={isInitial ? "arrow-forward" : "checkmark"}
                         size={28}
-                        color={hasChanges ? "#3B82F6" : "#9CA3AF"}
+                        color={(hasChanges || isInitial) ? "#3B82F6" : "#9CA3AF"}
                     />
                 </TouchableOpacity>
             </View>
@@ -54,8 +65,8 @@ export default function LanguageScreen() {
                                 onPress={() => setSelectedCode(lang.code)}
                                 activeOpacity={0.7}
                                 className={`flex-row items-center justify-between p-4 mb-3 mx-4 rounded-xl border ${isSelected
-                                        ? 'bg-blue-50 border-blue-500 shadow-sm'
-                                        : 'bg-white border-gray-200 shadow-sm'
+                                    ? 'bg-blue-50 border-blue-500 shadow-sm'
+                                    : 'bg-white border-gray-200 shadow-sm'
                                     }`}
                             >
                                 <View className="flex-row items-center flex-1">

@@ -42,20 +42,22 @@ export default function HomeScreen() {
                     </View>
                     <Text className="text-slate-500 font-medium text-sm mt-2">Master your vocabulary daily</Text>
                 </View>
-                <TouchableOpacity
-                    className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm overflow-hidden"
-                    onPress={() => router.push('/user-profile')}
-                >
-                    {avatarUri ? (
-                        <Image
-                            source={{ uri: avatarUri }}
-                            style={{ width: '100%', height: '100%' }}
-                            contentFit="cover"
-                        />
-                    ) : (
-                        <Ionicons name="person" size={20} color="#2563EB" />
-                    )}
-                </TouchableOpacity>
+                <View className="p-[2px] rounded-full bg-blue-500">
+                    <TouchableOpacity
+                        className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center border border-white shadow-sm overflow-hidden"
+                        onPress={() => router.push('/user-profile')}
+                    >
+                        {avatarUri ? (
+                            <Image
+                                source={{ uri: avatarUri }}
+                                style={{ width: '100%', height: '100%' }}
+                                contentFit="cover"
+                            />
+                        ) : (
+                            <Ionicons name="person" size={20} color="#2563EB" />
+                        )}
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Content */}

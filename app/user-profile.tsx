@@ -276,25 +276,29 @@ export default function UserProfileScreen() {
 
             <ScrollView contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 12 }}>
 
-                {/* User Info */}
                 <View className="items-center mb-8">
-                    <TouchableOpacity
-                        onPress={handlePickImage}
-                        className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-md mb-4 overflow-hidden relative"
-                    >
-                        {avatarUri ? (
-                            <Image
-                                source={{ uri: avatarUri }}
-                                style={{ width: '100%', height: '100%' }}
-                                contentFit="cover"
-                            />
-                        ) : (
-                            <Ionicons name="person" size={48} color="#3B82F6" />
-                        )}
-                        <View className="absolute bottom-0 right-0 left-0 h-6 bg-black/20 items-center justify-center">
-                            <Ionicons name="camera" size={12} color="white" />
-                        </View>
-                    </TouchableOpacity>
+                    {/* Outer ring */}
+                    <View className="p-1 rounded-full bg-blue-300">
+                        <TouchableOpacity
+                            onPress={handlePickImage}
+                            className="w-24 h-24 bg-blue-100 rounded-full items-center justify-center border-4 border-white shadow-md overflow-hidden relative"
+                        >
+                            {avatarUri ? (
+                                <Image
+                                    source={{ uri: avatarUri }}
+                                    style={{ width: '100%', height: '100%' }}
+                                    contentFit="cover"
+                                />
+                            ) : (
+                                <Ionicons name="person" size={48} color="#3B82F6" />
+                            )}
+
+                            {/* Camera overlay */}
+                            <View className="absolute bottom-0 right-0 left-0 h-6 bg-black/20 items-center justify-center">
+                                <Ionicons name="camera" size={12} color="white" />
+                            </View>
+                        </TouchableOpacity>
+                    </View>
 
                     <TouchableOpacity
                         className="flex-row items-center gap-2 mb-1"

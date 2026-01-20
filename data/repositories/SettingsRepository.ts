@@ -28,5 +28,14 @@ export const settingsRepository = {
         } catch (e) {
             console.error(e);
         }
+    },
+
+    async isLanguageSet(): Promise<boolean> {
+        try {
+            const lang = await AsyncStorage.getItem(LANGUAGE_KEY);
+            return lang !== null;
+        } catch (e) {
+            return false;
+        }
     }
 };

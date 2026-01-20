@@ -1,3 +1,4 @@
+import { settingsRepository } from '../data/repositories/SettingsRepository';
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -7,7 +8,6 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
     Easing,
-    withDelay,
     runOnJS
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +20,15 @@ export default function SplashScreen() {
     const progress = useSharedValue(0);
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.8);
+
+    const checkLanguageAndNavigate = async () => {
+        const hasLanguage = await settingsRepository.isLanguageSet();
+        if (hasLanguage) {
+            router.replace('/home');
+        } else {
+            router.replace('/language?initial=true');
+        }
+    };
 
     useEffect(() => {
         // Start animations
@@ -35,14 +44,10 @@ export default function SplashScreen() {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
         }, (finished) => {
             if (finished) {
-                runOnJS(navigateToHome)();
+                runOnJS(checkLanguageAndNavigate)();
             }
         });
     }, []);
-
-    const navigateToHome = () => {
-        router.replace('/home');
-    };
 
     const animatedLogoStyle = useAnimatedStyle(() => {
         return {
